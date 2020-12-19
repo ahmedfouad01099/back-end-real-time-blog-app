@@ -14,7 +14,7 @@ const fileStorage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     let date = new Date().toDateString();
-    console.log(date);
+    // console.log(date);
     cb(
       null,
       new Date().toISOString().replace(/[\/\\:]/g, "_") +
@@ -50,6 +50,7 @@ app.use((req, res, next) => {
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Origin", "*");
   next();
 });
 
@@ -68,6 +69,12 @@ mongoose
     "mongodb+srv://ahmedfouadDB:2255@cluster0.c7jvs.mongodb.net/posts?retryWrites=true&w=majority"
   )
   .then((result) => {
-    app.listen(8080);
+    const server = app.listen(8080);
+    // const io = require("socket.io")(server);
+    const io = require("./socket").init(server);
+    // console.log(io.on);
+    io.on("connection", (socket) => {
+      console.log("Client connected");
+    });
   })
   .catch((err) => console.log(err));
